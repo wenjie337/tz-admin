@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iboxpay.unity.qrcode.mapper.openplfm.StoreInfoMapper">
+   <select id="queryStoreInfo" resultType="com.iboxpay.unity.qrcode.entity.openplfm.StoreInfoDto" parameterType="map">
+		select * from(
+		select  i.store_no as "storeNo",
+				i.store_name as "storeName",
+				i.store_single_name as "storeSingleName",
+				i.store_status as "storeStatus",
+				i.store_type as "storeType",
+				i.belong_mcht_no as "belongMchtNo"
+		from 	tbl_store_info i	
+		where 	i.belong_mcht_no = #{mchtNo}
+		and i.is_deleted=#{isDeleted}
+		and 	i.store_type = #{storeType}
+		) where rownum=#{rownum}
+	</select>
+</mapper>

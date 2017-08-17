@@ -1,0 +1,22 @@
+description = 'admin-web'
+
+def suffix = '-SNAPSHOT'
+def env='d'
+if (project.hasProperty('env')) {
+    env = project.getProperty('env');
+	switch(env) {
+	case ['p', 'production']:
+		suffix = '-RELEASE'
+		break
+	}
+}
+
+dependencies {
+	compile project(':admin-rest')
+	compile project(':admin-security')
+	compile(libs.spring_boot_starter_web)
+	compile(libs.spring_boot_mybatis)
+	compile(libs.mysql)
+    provided(libs.servlet_api)
+	testCompile(libs.spring_boot_starter_test)
+}

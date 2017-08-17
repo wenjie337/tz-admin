@@ -1,0 +1,9 @@
+rootProject.name = 'tz-admin'
+include 'admin-common'
+include 'admin-server'
+include 'admin-security'
+include 'admin-rest'
+include 'admin-web'
+rootProject.children.each {project ->
+  project.buildFileName = "${project.name}.gradle"
+}

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.taozhi.mapper.UserMapper">
+	<resultMap id="resultMenu" type="java.util.HashMap">
+		<result property="id" column="ID" />
+		<result property="menuName" column="menuName" />
+		<result property="menuUrl" column="menuUrl" />
+		<result property="menuType" column="menuType" />
+		<result property="menuIndex" column="menuIndex" />
+		<result property="expand" column="expand" />
+		<result property="menuIcon" column="menuIcon" />
+		<result property="menuClass" column="menuClass" />
+		<result property="parentId" column="parentId" />
+		<result property="treeCode" column="treeCode" />
+	</resultMap>
+	
+	<select id="getUserRoles" resultType="string">
+		select role_name from t_sys_user u, t_sys_role r,t_sys_user_role ur where u.username=#{loginName} and u.id=ur.user_id and r.id=ur.role_id
+	</select>
+	
+
+	
+	<select id="findPermissions" resultType="string" >
+		select menu_url from t_sys_user u, t_sys_role r, t_sys_menu p, t_sys_user_role ur, t_sys_role_menu rp
+		 where u.username=#{loginName} and u.id=ur.user_id and r.id=ur.role_id and r.id=rp.role_id and p.id=rp.menu_id
+	</select>
+	
+	<select id="findPermissionRoles" resultType="string" >
+		SELECT method FROM t_sys_permission_roles p, t_sys_role r, t_sys_user u, t_sys_user_role ur
+				 where u.username=#{loginName} AND u.id=ur.user_id AND r.id=ur.role_id AND p.role_id=r.id
+	</select>
+	
+	<select id="findByUsername" resultType="com.taozhi.dto.SysUser">
+		select id,username,password from t_sys_user where user_status=0 and username=#{loginName} limit 1
+	</select>
+	<select id="findUserSysMenu" resultType="com.taozhi.dto.SysMenu">
+		select a.id,menu_name menuName,menu_url menuUrl,menu_type menuType,menu_index menuIndex,expand,menu_icon menuIcon
+    			 menu_class menuClass,parent_id parentId,tree_code treeCode
+    			 from t_sys_menu a,t_sys_role_menu b,t_sys_user_role c,t_sys_user d
+    			 where a.id = b.menu_id and b.role_id = c.role_id and c.user_id = d.id and a.menu_type>0 and d.username=#{loginName}
+	</select>
+	
+
+</mapper>

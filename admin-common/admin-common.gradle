@@ -1,0 +1,22 @@
+description = 'admin-common'
+
+def suffix = '-SNAPSHOT'
+def env='d'
+if (project.hasProperty('env')) {
+    env = project.getProperty('env');
+	switch(env) {
+	case ['p', 'production']:
+		suffix = '-RELEASE'
+		break
+	}
+}
+
+dependencies {
+	compile(libs.slf4j_api)
+	compile(libs.commons_lang3)
+	compile(libs.pagehelper)
+	compile(libs.spring_boot_starter_web)
+	provided(libs.servlet_api)
+	compile(libs.fastjson)
+	
+}

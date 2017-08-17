@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.iboxpay.unity.qrcode.mapper.cashbox.ServiceInterfaceConfMapper">
+	<resultMap id="BaseResultMap"
+		type="com.iboxpay.unity.qrcode.entity.cashbox.ServiceInterfaceConf">
+		<result property="id" column="ID" />
+		<result property="moduleId" column="MODULE_ID" />
+		<result property="serviceId" column="SERVICE_ID" />
+		<result property="processName" column="PROCESS_NAME" />
+		<result property="methodName" column="METHOD_NAME" />
+		<result property="servicePath" column="SERVICE_PATH" />
+		<result property="status" column="STATUS" />
+		<result property="interfaceType" column="INTERFACE_TYPE" />
+		<result property="isPaymentPwd" column="IS_PAY_PWD" />
+		<result property="timeOut" column="TIME_OUT" />
+		<result property="encryptState" column="ENCRYPT_STATE" />
+		<result property="requestMode" column="REQUEST_MODE" />
+		<result property="serviceDes" column="SERVICE_DES" />
+	</resultMap>
+
+
+	<select id="findByServicePath" resultMap="BaseResultMap">
+		SELECT * FROM
+		TBL_SERVICE_INTERFACE_CONF WHERE service_path=#{servicePath} and
+		module_id=#{moduleId}
+	</select>
+
+</mapper>

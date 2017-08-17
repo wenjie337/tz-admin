@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iboxpay.unity.qrcode.mapper.cashbox.PayRecordMapper">
+  <resultMap id="BaseResultMap" type="com.iboxpay.unity.qrcode.entity.cashbox.PayRecord">
+    <result column="ID"  property="id" />
+    <result column="ORDER_NO"  property="orderNo" />
+    <result column="OUT_TRADE_NO"  property="outTradeNo" />
+    <result column="CID"  property="cid" />
+    <result column="REDUCE_AMOUNT"  property="reduceAmount" />
+    <result column="AMOUNT"  property="amount" />
+    <result column="MCHT_NO"  property="mchtNo" />
+    <result column="MCHT_NAME"  property="mchtName" />
+    <result column="MCHT_USER_ID"  property="mchtUserId" />
+    <result column="CARD_NO"  property="cardNo" />
+    <result column="STATUS"  property="status" />
+    <result column="CONFIRM_CODE"  property="confirmCode" />
+    <result column="longitude"  property="longitude" />
+    <result column="latitude"  property="latitude" />
+    <result column="CREATE_TIME"  property="createTime" />
+    <result column="UPDATE_TIME"  property="updateTime" />
+    <result column="FINISH_TIME"  property="finishTime" />
+    <result column="TRADE_NO"  property="tradeNo" />
+    <result column="TRADE_TYPE"  property="tradeType" />
+    <result column="TRADE_TIME"  property="tradeTime" />
+    <result column="ERROR_CODE"  property="errorCode" />
+    <result column="ERROR_DESC"  property="errorDesc" />
+    <result column="REMARK"  property="remark" />
+    <result column="NOTIFY_URL"  property="notifyUrl" />
+    
+  </resultMap>
+  
+  <insert id="save" parameterType="com.iboxpay.unity.qrcode.entity.cashbox.PayRecord">
+  
+	<selectKey resultType="long" keyProperty="id" order="BEFORE">
+		SELECT SEQ_TBL_SQR_CODE_PAY_ORDER.nextval as id FROM dual
+	</selectKey>
+	
+    insert into TBL_SQR_CODE_PAY_ORDER (ID,ORDER_NO,OUT_TRADE_NO,CID,AMOUNT,REDUCE_AMOUNT,STATUS,CREATE_TIME,UPDATE_TIME,
+    TRADE_NO,TRADE_TYPE,TRADE_TIME,SETTLE_TYPE,CONFIRM_CODE,LONGITUDE,LATITUDE,
+    ERROR_CODE,ERROR_DESC,REMARK,MCHT_NO,MCHT_NAME,MCHT_USER_ID,FINISH_TIME,NOTIFY_URL)
+    values (#{id}, #{orderNo},#{outTradeNo},#{cid},#{amount},#{reduceAmount}, #{status},
+      sysdate, sysdate, #{tradeNo}, #{tradeType}, 
+      #{tradeTime}, #{settleType}, #{confirmCode}, 
+      #{longitude}, #{latitude}, #{errorCode}, #{errorDesc}, 
+      #{remark},#{mchtNo},#{mchtName},#{mchtUserId},#{finishTime},#{notifyUrl})
+  </insert>
+  
+  <update id="finishOrder">
+	update TBL_SQR_CODE_PAY_ORDER set status=#{newStatus},UPDATE_TIME=sysdate, FINISH_TIME=sysdate 
+	<if test="errorCode != null and errorCode != ''">
+		,ERROR_CODE=#{errorCode}
+	</if>
+	<if test="errorDesc != null and errorDesc != ''">
+		,ERROR_DESC=#{errorDesc}
+	</if>
+	where order_no = #{orderNo} and status=#{oldStatus}
+  </update>
+  
+  
+  <select id="queryByOrderNo" resultMap="BaseResultMap">
+  	SELECT * from TBL_SQR_CODE_PAY_ORDER where order_no = #{orderNo}
+  </select>
+
+  <select id="queryByTradeNo" resultMap="BaseResultMap">
+  	SELECT * from TBL_SQR_CODE_PAY_ORDER where trade_no = #{tradeNo}
+  </select>
+  
+  <update id="updatePayTradeInfo" parameterType="map">
+	update TBL_SQR_CODE_PAY_ORDER set UPDATE_TIME=sysdate
+	<if test="tradeNo != null and tradeNo !='' ">
+		,trade_no = #{tradeNo}
+	</if>
+	<if test="tradeTime != null and tradeTime !='' ">
+		,trade_time = #{tradeTime}
+	</if>
+	where id = #{id}
+  </update>
+  
+  <update id="updatePayResultInfo" parameterType="map">
+	update TBL_SQR_CODE_PAY_ORDER set status=#{status} ,UPDATE_TIME=sysdate, FINISH_TIME=sysdate
+	<if test="tradeNo != null and tradeNo !='' ">
+		,trade_no = #{tradeNo}
+	</if>
+	<if test="tradeTime != null and tradeTime !='' ">
+		,trade_time = #{tradeTime}
+	</if>
+	<if test="errorCode != null and errorCode !='' ">
+		,error_code = #{errorCode}
+	</if>
+	<if test="errorDesc != null and errorDesc !='' ">
+		,error_desc = #{errorDesc}
+	</if>
+	where id = #{id} and status=#{oldStatus} 
+  </update>
+  
+  </mapper>

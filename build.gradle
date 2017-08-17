@@ -1,0 +1,244 @@
+apply from: 'dependency.gradle'
+apply plugin: 'org.springframework.boot'
+  
+buildscript {
+    apply from: 'dependency.gradle'
+    project.ext.companyMavenUrls = []
+    project.ext.thirdpartyMavenUrls = []
+
+    project.properties.each {
+        if(it.key.startsWith('company_maven_url')) {
+            project.ext.companyMavenUrls << (nexus_server_url + it.value)
+        } else if(it.key.startsWith('thirdparty_maven_url')) {
+            project.ext.thirdpartyMavenUrls << it.value
+        }
+    }
+
+    repositories {
+        project.ext.thirdpartyMavenUrls.each { addr ->
+            maven { url addr }
+        }
+        mavenCentral()
+        
+    }
+    dependencies {
+        classpath(libs.spring_boot_gradle_plugin)
+    }
+}
+
+ext {
+	expectedGradleVersion = gradle_wrapper_version
+	javaLanguageLevel = System.properties['java.specification.version']
+	envPropsDir = "${rootProject.projectDir}/env"
+	isExcludeResouces4SubProjects = project.hasProperty('isExcludeResouces') ? Boolean.parseBoolean(isExcludeResouces) : true
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+    apply plugin: 'idea'
+    apply plugin: 'jdepend'
+
+    version = project_version
+    group = project_group_id
+    
+    eclipse {
+        classpath {
+           downloadSources = true
+        }
+    }
+    
+	repositories {
+	 	rootProject.ext.thirdpartyMavenUrls.each { addr ->
+            maven { url addr }
+        }
+        mavenCentral()
+       
+        
+        jcenter()
+	}
+	
+	configurations.all {
+		resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
+		exclude group: "org.slf4j", module: "slf4j-log4j12"
+		exclude group: "log4j", module: "log4j"
+		exclude group: "junit", module: "junit"
+		
+		 // 有版本冲突的时候强制使用指定的版本，对于相关依赖也同样有效
+	    resolutionStrategy.force(
+	      "ch.qos.logback:logback-core:1.1.11", 
+	      "ch.qos.logback:logback-classic:1.1.11"
+	    )
+	}
+}
+
+// 获取web工程
+def webProjects = subprojects.findAll { it.name.contains('-web') }
+
+// 获取非web工程
+def nonWebProjects = subprojects - webProjects
+
+subprojects {
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+        targetCompatibility = rootProject.javaLanguageLevel
+        sourceCompatibility = rootProject.javaLanguageLevel
+        options.compilerArgs << '-XDignore.symbol.file -Xlint:none'
+        options.fork = true
+        options.forkOptions.executable = 'javac'
+    }
+    
+    configurations {
+		provided
+	}
+
+	sourceSets {
+	    main.compileClasspath += configurations.provided
+	    test.compileClasspath += configurations.provided
+	}
+
+	
+	eclipse.classpath.plusConfigurations += [configurations.provided]
+}
+
+// 处理非web工程
+configure(nonWebProjects) {
+
+    // 打包子工程的源代码
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+    
+    artifacts {
+        archives sourcesJar
+    }
+}
+
+// 确定要运行的环境
+task getEnv {
+    // 默认为开发环境
+    ext.envConfigFileName = "dev"
+    if (project.hasProperty('env')) {
+        String env = project.getProperty('env');
+        switch(env) {
+            case ['t', 'test']:
+                ext.envConfigFileName = "test"
+                break
+            case 'pre':
+                ext.envConfigFileName = "pre"
+                break
+            case ['p', 'prod']:
+                ext.envConfigFileName = "pro"
+                break
+        }
+    }
+}
+
+// 获取环境对应的配置
+task initEnvConfig(dependsOn: getEnv) {
+    ext.props = new Properties()
+    new File("${envPropsDir}/${getEnv.envConfigFileName}.properties").withInputStream { stream ->
+        props.load(stream)
+    }
+}
+
+// 处理web工程
+configure(webProjects) {
+    apply plugin: 'war'
+
+	task removeOldWar{
+	    rootProject.projectDir.eachFileMatch(~/${rootProject.name}-${project.version}.*\.war/) {File warFile-> warFile.delete()} //使正则表达式匹配文件名
+	}
+
+    war {
+    	version = output_version;
+    	baseName = final_name
+        dependsOn removeOldWar
+        destinationDir webProjects.buildDir
+		
+		exclude 'htm/*.html'
+        from('src/main/webapp/htm') {
+        	// 使用"@占位符@"
+			filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: rootProject.initEnvConfig.props)
+			into "htm"
+        }
+    }
+	
+	//复制版本文件到编译目录下，启动控制台显示
+    task copyDevVersionFiles(type: Copy, overwrite: true){
+	    from(rootProject.projectDir) {
+			include 'VERSION'
+		}
+	    into 'bin'
+	}
+	
+	task copyProVersionFiles(type: Copy, overwrite: true){
+	    from(rootProject.projectDir) {
+			include 'VERSION'
+		}
+	    into 'build/resources/main'
+	}
+
+    // 过滤资源文件，并将其输出到当前工程的build/resources/main目录下
+    processResources {
+        dependsOn rootProject.initEnvConfig, copyDevVersionFiles, copyProVersionFiles
+        
+        doFirst {
+            def projectsDepended = project.configurations.compile.getAllDependencies().withType(ProjectDependency).collect { it.dependencyProject }
+            from((projectsDepended << project)*.sourceSets.main.resources.srcDirs) {
+                filesMatching('**/*.properties') {
+                    // 使用"@占位符@"
+                    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: rootProject.initEnvConfig.props)
+                }
+            }
+            exclude 'logback-test.xml'
+            into "${buildDir}/resources/main"
+        }
+		
+    }
+    
+	bootRepackage {
+	    mainClass  = 'com.iboxpay.unity.spring.Application'
+	}
+	    
+	springBoot {
+	    mainClass = "com.iboxpay.unity.spring.Application"
+	}
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = expectedGradleVersion
+}
+
+String getCurrentTimestampStr() {
+	new Date().format('yyyyMMdd_HHmmss')
+}
+
+// 初始化开发环境的配置
+task generateConfigForDev << {
+	def suffix = '_bak'
+	allprojects*.sourceSets.main.resources.srcDirs.each { srcDir ->
+		// 备份原配置文件
+		copy {
+			includeEmptyDirs = false
+			from(srcDir[0]) {
+				include '**/*.properties'
+            	rename { it + suffix }
+			}
+      		into srcDir[0]
+      	}
+      	
+      	// 替换配置文件中的占位符
+		copy {
+			includeEmptyDirs = false
+			from(srcDir[0]) {
+				include '**/*.properties' + suffix
+	            filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: rootProject.initEnvConfig.envConfig)
+            	rename { it.substring(0, it.lastIndexOf(suffix)) }
+			}
+      		into srcDir[0]
+      	}
+  	}
+}

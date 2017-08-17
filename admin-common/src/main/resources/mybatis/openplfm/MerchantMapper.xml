@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iboxpay.unity.qrcode.mapper.openplfm.MerchantMapper">
+
+	<select id="getMerchantByMchtNo"
+		resultType="com.iboxpay.unity.qrcode.entity.openplfm.MerchantInfoDto"
+		parameterType="map">
+		SELECT
+		b.ID as id,
+		b.MCHT_NO as mchtNo,
+		b.MCHT_NM as mchtName,
+		b.MCHT_TYPE as mchtType,
+		b.MCHT_UP_NO as mchtUpNo,
+		b.MCHT_STATUS as mchtStatus
+		FROM
+		TBL_MCHT_BASE b
+		WHERE
+		b.MCHT_NO=#{mchtNo}
+	</select>
+	
+	
+	<select id="getMerchantByMchtNoGroup" resultType="map" parameterType="map">
+	select * from(
+		select b.MCHT_NO         as "partner",
+		   b.MCHT_UP_NO		 as "mchtUpNo",
+	       b.MCHT_NM         as "mchtName",
+	       b.MCHT_NM_SINGLE  as "singleName",
+	       b.MCHT_KIND       as "mchtKind",
+	       b.MCHT_TYPE       as "mchtType",
+	       b.MCHT_BRH        as "brhNo",
+	       b.SOURCE          as "mchtSource",
+	       b.MCHT_AREA_NO    as "regionCode",
+	       b.MCHT_ADDR    	 as "mchtAddr",
+	       b.MCHT_STATUS     as "mchtStatus",
+	       b.MCHT_GRP		 as "mccGroup",
+	       b.MCHT_RANK       as "mchtRank",
+	       u.USER_ID	 	 as "mchtUserId",
+	       u.USER_NAME		 as "mchtUserName",
+		   u.USER_PHONE 	 as "mobileNo",
+		   b.MCHT_S0_RANK 	 as "s0Rank",
+		   b.mcht_t0_rank    as "t0Rank",
+		   u.USER_CARD_NO 	 as "cardNo"
+
+	      FROM TBL_MCHT_BASE     b,
+	      		TBL_MCHT_USER     u
+	     WHERE u.mcht_no = b.mcht_no
+	       AND b.MCHT_NO = #{mchtNo}
+	       AND u.USER_PRIMARY IN 
+	       <foreach collection="primaryList" item="primary" open="(" close=")" separator=",">
+	        #{primary}
+	       </foreach>
+	       AND u.USER_STATUS = #{userStatus}
+	       ORDER BY u.USER_PRIMARY DESC
+	      ) where rownum = #{rownum}
+	</select>
+	
+    <select id="getMchtPreviewInfo" resultType="map" parameterType="map">
+        select  mcht_no as "mchtNo",
+        stat as "stat",
+        card_st as "cardStatus",
+        card_desc as "cardDesc" ,
+        id_st as "idStatus",
+        id_desc as "idDesc",
+        lisc_st as "liscStatus",
+        lisc_desc as "liscDesc"
+        from tbl_mcht_preview
+        where mcht_no = #{mchtNo}
+        and rownum=1
+    </select>
+</mapper>

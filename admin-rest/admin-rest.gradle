@@ -1,0 +1,21 @@
+description = 'admin-rest'
+
+def suffix = '-SNAPSHOT'
+def env='d'
+if (project.hasProperty('env')) {
+    env = project.getProperty('env');
+	switch(env) {
+	case ['p', 'production']:
+		suffix = '-RELEASE'
+		break
+	}
+}
+
+dependencies {
+	compile project(':admin-common')
+	compile project(':admin-server')
+	compile(libs.spring_boot_starter) 
+   	compile(libs.spring_boot_starter_logging)
+	compile(libs.spring_boot_freemarker)
+    provided(libs.servlet_api)
+}

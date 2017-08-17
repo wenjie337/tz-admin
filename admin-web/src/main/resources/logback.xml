@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user -->
+<!-- -->
+<!-- For professional support please see -->
+<!-- http://www.qos.ch/shop/products/professionalSupport -->
+<!-- -->
+<configuration scan="true" scanPeriod="10 seconds" debug="DEBUG">
+	<substitutionProperty name="log.base" value="./logs" />
+	<substitutionProperty name="log.app" value="${log.base}/app" />
+	<substitutionProperty name="log.error" value="${log.base}/error" />
+	<!-- 单个压缩文件最大大小 -->
+	<property name="log.maxFileSize" value="5MB" />
+	
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%date{yyyy-MM-dd HH:mm:ss:SSS} [%t] %-5level %logger{80} %X{transactionId} - %msg%n</pattern>
+		</layout>
+	</appender>
+
+	<appender name="app"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${log.app}/app.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>
+				${log.app}/app.log.%d{yyyy-MM-dd-HH}.%i
+			</FileNamePattern>
+			<TimeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<MaxFileSize>${log.maxFileSize}</MaxFileSize>
+			</TimeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<Pattern>%date{yyyy-MM-dd HH:mm:ss:SSS} [%t] %-5level [%logger{0} ] %X{transactionId} - %msg%n</Pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+
+	<appender name="error"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<File>${log.error}/error.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>
+				${log.error}/error.log.%d{yyyy-MM-dd-HH}.%i
+			</FileNamePattern>
+			<TimeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<MaxFileSize>${log.maxFileSize}</MaxFileSize>
+			</TimeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<Pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level [%logger{0} ] %X{transactionId} - %msg%n</Pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<logger name="org.springframework" additivity="false">
+		<appender-ref ref="app" />
+	</logger>
+
+	<logger name="org.mybatis" level="debug" additivity="false">
+		<appender-ref ref="app" />
+	</logger>
+	<logger name="com.taozhi" additivity="false">
+		<appender-ref ref="app" />
+		<appender-ref ref="error" />
+	</logger>
+
+	<root level="debug">
+		<appender-ref ref="app" />
+		<appender-ref ref="stdout" />
+	</root>
+</configuration>

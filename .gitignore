@@ -1,0 +1,16 @@
+.classpath
+.gradle/
+.project
+.settings/
+admin-rest/build/
+admin-server/build/
+admin-web/bin/alipayConfig.properties
+admin-rest/bin/
+admin-server/bin/
+admin-web/bin/
+admin-web/logs/
+admin-web/build/
+admin-web/disconf/
+admin-common/bin/
+admin-common/build/
+build/
