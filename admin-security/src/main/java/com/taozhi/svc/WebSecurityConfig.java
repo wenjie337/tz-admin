@@ -10,7 +10,10 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.session.ConcurrentSessionFilter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.taozhi.filter.MyExceptionTranslationFilter;
@@ -41,6 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.addFilterAfter(new ConcurrentSessionFilter(sessionRegistry(), "/signin"), ConcurrentSessionFilter.class);
         http.addFilterAfter(mySecurityFilter, FilterSecurityInterceptor.class)//
                 .addFilterAfter(myExceptionTranslationFilter, MyExceptionTranslationFilter.class)//
                 .authorizeRequests().antMatchers("/", "/signin").permitAll()//
@@ -91,5 +95,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public MyAccessDeniedHandler accessDeniedHandler() {
         return new MyAccessDeniedHandler();
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
     }
 }

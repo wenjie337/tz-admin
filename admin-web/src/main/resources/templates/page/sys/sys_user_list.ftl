@@ -2,6 +2,7 @@
 [#import "../../common/page.ftl" as pager /]
 <head>
 <base href="${request.contextPath}/" />
+[#include '../../common/css.ftl' /]
 <script>
 function delSysUser(){
 	var delstr = '';
@@ -115,6 +116,7 @@ function delSysUser(){
 
 <pagetitle>系统用户</pagetitle>
 
+	[#include '../../common/js.ftl' /]
 <pagescript>
 <script src="js/parsley/parsley.min.js"></script>
 <script src="js/parsley/parsley.extend.js"></script>
