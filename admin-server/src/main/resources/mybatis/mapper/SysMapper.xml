@@ -71,7 +71,7 @@
 	</delete>
 	
 	<select id="findUserSysMenu" resultType="com.taozhi.dto.SysMenu">
-		select a.id,menu_name menuName,menu_url menuUrl,menu_type menuType,menu_index menuIndex,
+		select distinct a.id,menu_name menuName,menu_url menuUrl,menu_type menuType,menu_index menuIndex,
 			expand,menu_icon menuIcon,menu_class menuClass,parent_id parentId,tree_code treeCode 
 		from t_sys_menu a,t_sys_role_menu b,t_sys_user_role c,t_sys_user d 
 		where a.id = b.menu_id and b.role_id = c.role_id and c.user_id = d.id and a.menu_type>0 and d.username = #{username}

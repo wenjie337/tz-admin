@@ -17,6 +17,7 @@ import com.taozhi.filter.MyExceptionTranslationFilter;
 import com.taozhi.filter.MySecurityFilter;
 import com.taozhi.handler.LoginFailHandler;
 import com.taozhi.handler.LoginSuccessHandler;
+import com.taozhi.handler.MyAccessDeniedHandler;
 import com.taozhi.handler.MyLogoutSuccessHandler;
 
 @Configuration
@@ -45,18 +46,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/", "/signin").permitAll()//
                 .anyRequest().authenticated()//
                 .and()//
+                .headers().frameOptions().disable()//
+                .and()//
                 .formLogin()//
                 .loginProcessingUrl("/login")//
                 .usernameParameter("username")//
                 .passwordParameter("password")//
                 .permitAll()//
                 .successHandler(loginSuccessHandler())//
+                .failureUrl("/signin")//
                 .failureHandler(loginFailHandler())//
                 .and()//
                 .logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler())//
                 .and()//
-                .exceptionHandling()//
-                .accessDeniedPage("/accessDenied")//
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler())//
                 .and()//
                 .csrf().disable();//
     }
@@ -85,4 +88,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new MyLogoutSuccessHandler();
     }
 
+    @Bean
+    public MyAccessDeniedHandler accessDeniedHandler() {
+        return new MyAccessDeniedHandler();
+    }
 }

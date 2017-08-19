@@ -39,7 +39,7 @@
         <header class="panel-heading text-center">
           <strong>登 录</strong>
         </header>
-        <form action="login.htm" class="panel-body wrapper-lg" method="post">
+        <form action="login" class="panel-body wrapper-lg" method="post">
           <div class="form-group">
             <label class="control-label">用户名</label>
             <input type="textfield" id="username" name="username" placeholder="" class="form-control input-lg">
@@ -61,7 +61,9 @@
           </div>
           <div class="line line-dashed"></div>
         </form>
+        
       </section>
+      
     </div>
   </section>
   <!-- footer -->

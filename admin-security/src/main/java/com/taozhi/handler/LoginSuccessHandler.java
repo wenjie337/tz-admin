@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
@@ -18,7 +20,13 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
         //输出登录提示信息  
-        //		super.onAuthenticationSuccess(request, response, authentication);
+
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        request.getSession().setAttribute("username", userDetails.getUsername());
+
+        System.out.println("login success");
+        LOG.info("login success");
+        response.sendRedirect(request.getContextPath() + "/index");
 
     }
 

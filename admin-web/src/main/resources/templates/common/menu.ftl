@@ -43,7 +43,11 @@
           			<li [#if menu.id==curpid || (curpid ==0 && menu.expand==1)]class="active"[/#if]>
 		              <a href="javascript:;" [#if menu.id==curpid || (curpid ==0 && menu.expand==1)]class="active"[/#if]>
 		                <i class="fa ${menu.menuIcon} icon">
-		                  <b class="${menu.menuClass}"></b>
+		                	[#if menu.menuClass?exists]
+		                 		 <b class="${menu.menuClass}"></b>
+		                    [#else]
+		                   		 <b class=""></b>
+		                  	[/#if]
 		                </i>
 		                <span class="pull-right">
 		                  <i class="fa fa-angle-down text"></i>

@@ -15,4 +15,5 @@ dependencies {
 	compile project(':admin-common')
 	compile(libs.spring_boot_starter) 
 	compile(libs.spring_boot_security)
+	compile(libs.pagehelper)
 }

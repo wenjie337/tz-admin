@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="zh_CN" class="app">
 <head>
-	<base href="${rc.contextPath}/" />
+	<base href="${request.contextPath}/" />
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	[#--<title><sitemesh:write property="title"/></title>--]
 	<title>FWHD Admin V1.0</title>

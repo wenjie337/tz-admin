@@ -8,10 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 public class LoginFailHandler implements AuthenticationFailureHandler {
@@ -20,13 +17,10 @@ public class LoginFailHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        if (exception instanceof UsernameNotFoundException) {
-            LOG.error(exception.getMessage());
-        }
+        LOG.info("login fail");
+        request.setAttribute("loginFail", "loginFail");
+        response.sendRedirect(request.getContextPath() + "/signin");
 
-        if (exception instanceof BadCredentialsException) {}
-
-        if (exception instanceof DisabledException) {}
     }
 
 }

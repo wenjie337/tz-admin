@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 //import org.apache.log4j.Logger;
 //import org.apache.shiro.SecurityUtils;
@@ -11,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 //import org.apache.shiro.authc.UsernamePasswordToken;
 //import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,10 +49,12 @@ public class LoginController {
     }
 
     @SuppressWarnings("rawtypes")
-    @RequestMapping("/login")
+    @RequestMapping("/index")
     public String index(HttpServletRequest request) {
 
-        String username = (String) request.getSession().getAttribute("username");
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String username = userDetails.getUsername();
         List umenus = (List) request.getSession().getAttribute("usermenus");
         if (TextUtil.isValid(username) && (umenus == null || umenus.isEmpty())) {
             List<SysMenu> menus = sysMenu(username);
@@ -60,8 +65,8 @@ public class LoginController {
     }
 
     @RequestMapping("/main")
-    public String main(HttpServletRequest request) {
-        return "/_welcome";
+    public String main(HttpServletRequest request, HttpServletResponse response) {
+        return "/page/_welcome";
     }
 
     private List<SysMenu> sysMenu(String username) {
@@ -109,4 +114,5 @@ public class LoginController {
         mav.setViewName("/unauthorized");
         return mav;
     }
+
 }

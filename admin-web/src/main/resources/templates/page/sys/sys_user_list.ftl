@@ -1,7 +1,7 @@
 [#ftl]
-[#import "page.ftl" as pager /]
-
+[#import "../../common/page.ftl" as pager /]
 <head>
+<base href="${request.contextPath}/" />
 <script>
 function delSysUser(){
 	var delstr = '';

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="zh_CN" class="app">
 <head>
-	
+	<base href="${request.contextPath}/" />
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	[#--<title><sitemesh:write property="title"/></title>--]
 	<title>FWHD Admin V1.0</title>
@@ -28,7 +28,7 @@
 					[#include '../common/menu.ftl' /]
 				[/#if]
 				<section id="content" style="-webkit-overflow-scrolling:touch; width:100%;overflow-x:auto;overflow-y:hidden">
-				    <iframe id="ifhtml" scrolling="yes" frameborder="0" src="main.htm" width="100%" height="100%" style="min-height:500px"/></iframe>
+				    <iframe id="ifhtml" scrolling="yes" frameborder="0" src="main" width="100%" height="100%" style="min-height:500px"/></iframe>
 			        <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
 			    </section>
 			    <aside class="bg-light lter b-l aside-md hide" id="notes">

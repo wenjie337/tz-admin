@@ -42,13 +42,10 @@ ext {
 	  
 	  fastjson: "com.alibaba:fastjson:$versions.fastjson",
 	  
-	  pagehelper:"com.github.pagehelper:pagehelper:3.2.3",
+	  pagehelper:"com.github.pagehelper:pagehelper-spring-boot-starter:1.1.3",
 	  
 	  mysql:"mysql:mysql-connector-java:5.1.42",
-	  mybatis:"org.mybatis:mybatis",
-	  mybatis_spring:"org.mybatis:mybatis-spring",
-	  mybatis_generator:"org.mybatis.generator:mybatis-generator-core",
-	  
+	 
 	  shiro_core:"org.springframework.boot:shiro-core:$versions.shiro",
 	  shiro_spring:"org.apache.shiro:shiro-spring:$versions.shiro",
 	  shiro_ehcache:"org.apache.shiro:shiro-ehcache:$versions.shiro"

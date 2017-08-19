@@ -1,5 +1,6 @@
 [#ftl]
 <head>
+	[#include '../common/css.ftl' /]
 	<link rel="stylesheet" href="js/fullcalendar/fullcalendar.css" type="text/css"  />
     <link rel="stylesheet" href="js/fullcalendar/theme.css" type="text/css" />
 </head>
@@ -34,7 +35,7 @@
 	  </section>
 	  
 	</section>
-        
+        [#include '../common/js.ftl' /]
 	<pagescript>
 	    <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
 		<script src="js/jquery.ui.touch-punch.min.js"></script>

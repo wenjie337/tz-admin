@@ -35,13 +35,12 @@ public class SysController {
     private SysService sysService;
 
     @RequestMapping("/getSysUser")
-    public String getSysUser(HttpServletRequest request) {
+    public String getSysUser(HttpServletRequest request, HttpServletResponse response) {
 
         List<SysUser> list = sysService.findSysUser();
 
         request.setAttribute("users", ((Page) list));
         request.setAttribute("page", Pager.page(((Page) list)));
-
         return "/page/sys/sys_user_list";
     }
 
